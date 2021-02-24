@@ -1,16 +1,31 @@
-FROM debian:9
+FROM ubuntu:20.04
 
-MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
-MAINTAINER Giannis Mouchakis <gmouchakis@iit.demokritos.gr>
+MAINTAINER BLUEAT <m8928@me.com>
 
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Seoul
+
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends apt-utils
+RUN apt-get install -y --no-install-recommends \
+      locales \
+      tzdata \
       openjdk-8-jdk \
       net-tools \
       curl \
       netcat \
       gnupg \
       libsnappy-dev \
+      vi \
+      vim \
+      iputils-ping \
     && rm -rf /var/lib/apt/lists/*
+
+RUN locale-gen en_US.UTF-8
+
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
       
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
