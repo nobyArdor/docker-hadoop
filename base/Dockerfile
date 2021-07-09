@@ -1,7 +1,5 @@
 FROM ubuntu:20.04
 
-MAINTAINER BLUEAT <m8928@me.com>
-
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Seoul
 
@@ -16,9 +14,9 @@ RUN apt-get install -y --no-install-recommends \
       netcat \
       gnupg \
       libsnappy-dev \
-      vi \
       vim \
       iputils-ping \
+      rename \
     && rm -rf /var/lib/apt/lists/*
 
 RUN locale-gen en_US.UTF-8
@@ -27,13 +25,13 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
       
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
 RUN curl -O https://dist.apache.org/repos/dist/release/hadoop/common/KEYS
 
 RUN gpg --import KEYS
 
-ENV HADOOP_VERSION 3.2.1
+ENV HADOOP_VERSION 3.2.2
 ENV HADOOP_URL https://www.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 
 RUN set -x \
@@ -51,6 +49,7 @@ RUN mkdir /hadoop-data
 
 ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop
+ENV HADOOP_CLASSPATH=/etc/hadoop:/opt/hadoop-3.2.2/share/hadoop/common/lib/*:/opt/hadoop-3.2.2/share/hadoop/common/*:/opt/hadoop-3.2.2/share/hadoop/hdfs:/opt/hadoop-3.2.2/share/hadoop/hdfs/lib/*:/opt/hadoop-3.2.2/share/hadoop/hdfs/*:/opt/hadoop-3.2.2/share/hadoop/mapreduce/lib/*:/opt/hadoop-3.2.2/share/hadoop/mapreduce/*:/opt/hadoop-3.2.2/share/hadoop/yarn:/opt/hadoop-3.2.2/share/hadoop/yarn/lib/*:/opt/hadoop-3.2.2/share/hadoop/yarn/*
 ENV MULTIHOMED_NETWORK=1
 ENV USER=root
 ENV PATH $HADOOP_HOME/bin/:$PATH

@@ -1,8 +1,6 @@
-FROM bde2020/hadoop-base:2.0.0-hadoop3.2.1-java8
+FROM 192.168.150.83:15000/m8928/hadoop-base-with-tez:3.2.2-java8
 
-MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
-
-HEALTHCHECK CMD curl -f http://localhost:8042/ || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5m CMD curl -f http://localhost:8042/ || exit 1
 
 ADD run.sh /run.sh
 RUN chmod a+x /run.sh
