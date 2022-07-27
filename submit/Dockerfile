@@ -1,4 +1,4 @@
-FROM bde2020/hadoop-base-with-tez:3.3.3-java8
+FROM bde2020/hadoop-base-with-tez:2.0.0-hadoop3.3.3-hive3.1.3-java8
 
 MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
 

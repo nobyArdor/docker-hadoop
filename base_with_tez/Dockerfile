@@ -1,4 +1,4 @@
-FROM bde2020/hadoop-base:3.3.3-java8
+FROM bde2020/hadoop-base:2.0.0-hadoop3.3.3-hive3.1.3-java8
 
 ENV TEZ_VERSION 0.10.1
 

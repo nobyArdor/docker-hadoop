@@ -2,8 +2,8 @@ version: '3.3'
 
 services:
   namenode:
-    image: bde2020/hadoop-namenode:3.3.3-java8
-    hostname: "namenode-{{.Node.ID}}"
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.3.3-hive3.1.3-java8
+    hostname: "namenode"
     networks:
       - hadoop
     ports:
@@ -26,8 +26,8 @@ services:
         condition: on-failure
 
   datanode:
-    image: bde2020/hadoop-datanode:3.3.3-java8
-    hostname: "datanode-{{.Node.ID}}"
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.3.3-hive3.1.3-java8
+    hostname: "datanode"
     networks:
       - hadoop
     volumes:
@@ -52,7 +52,7 @@ services:
         condition: on-failure
 
   nodemanager:
-    image: bde2020/hadoop-nodemanager:3.3.3-java8
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.3.3-hive3.1.3-java8
     networks:
       - hadoop
     environment:
@@ -68,7 +68,7 @@ services:
         condition: on-failure
 
   resourcemanager:
-    image: bde2020/hadoop-resourcemanager:3.3.3-java8
+    image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.3.3-hive3.1.3-java8
     networks:
       - hadoop
     ports:
@@ -87,7 +87,7 @@ services:
         condition: on-failure
 
   historyserver:
-    image: bde2020/hadoop-historyserver:3.3.3-java8
+    image: bde2020/hadoop-historyserver:2.0.0-hadoop3.3.3-hive3.1.3-java8
     networks:
       - hadoop
     ports:
@@ -108,7 +108,7 @@ services:
         condition: on-failure
 
   metastore:
-    image: postgres:latest
+    image: postgres:14.4
     networks:
       - hadoop
     volumes:
@@ -128,7 +128,7 @@ services:
         condition: on-failure
 
   hiveserver:
-    image: bde2020/hadoop-hiveserver:3.3.3-java8
+    image: bde2020/hadoop-hiveserver:2.0.0-hadoop3.3.3-hive3.1.3-java8
     networks:
       - hadoop
     ports:
