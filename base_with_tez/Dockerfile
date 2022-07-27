@@ -1,4 +1,4 @@
-FROM 192.168.150.83:15000/m8928/hadoop-base:3.3.3-java8
+FROM bde2020/hadoop-base:3.3.3-java8
 
 ENV TEZ_VERSION 0.10.1
 

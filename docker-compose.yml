@@ -1,125 +1,151 @@
-version: "3"
+version: '3.3'
 
 services:
   namenode:
-    image: m8928/hadoop-namenode:3.3.3-java8
-    container_name: namenode
-    restart: always
+    image: bde2020/hadoop-namenode:3.3.3-java8
+    hostname: "namenode-{{.Node.ID}}"
+    networks:
+      - hadoop
     ports:
       - 9870:9870
       - 9000:9000
     volumes:
-      - /data/docker_container/hadoop_namenode:/hadoop/dfs/name
+      - /data/container_data/namenode:/hadoop/dfs/name
       - /tmp:/tmp
     environment:
-      - CLUSTER_NAME=SEARCH
+      - CLUSTER_NAME=HADOOP
     env_file:
       - ./hadoop.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
 
-  datanode01:
-    image: m8928/hadoop-datanode:3.3.3-java8
-    container_name: datanode01
-    restart: always
+  datanode:
+    image: bde2020/hadoop-datanode:3.3.3-java8
+    hostname: "datanode-{{.Node.ID}}"
+    networks:
+      - hadoop
     volumes:
-      - /data/docker_container/hadoop_datanode01:/hadoop/dfs/data
+      - /data/container_data/datanode:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
       - ./hadoop.env
+    ports:
+     - target: 9864
+       published: 9864
+       mode: host
+     - target: 9866
+       published: 9866
+       mode: host
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.labels.datanode==true
+      restart_policy:
+        condition: on-failure
 
-  datanode02:
-    image: m8928/hadoop-datanode:3.3.3-java8
-    container_name: datanode02
-    restart: always
-    volumes:
-      - /data/docker_container/hadoop_datanode02:/hadoop/dfs/data
+  nodemanager:
+    image: bde2020/hadoop-nodemanager:3.3.3-java8
+    networks:
+      - hadoop
     environment:
-      SERVICE_PRECONDITION: "namenode:9870"
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
     env_file:
       - ./hadoop.env
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.labels.datanode==true
+      restart_policy:
+        condition: on-failure
 
-  datanode03:
-    image: m8928/hadoop-datanode:3.3.3-java8
-    container_name: datanode03
-    restart: always
-    volumes:
-      - /data/docker_container/hadoop_datanode03:/hadoop/dfs/data
-    environment:
-      SERVICE_PRECONDITION: "namenode:9870"
-    env_file:
-      - ./hadoop.env
-  
   resourcemanager:
-    image: m8928/hadoop-resourcemanager:3.3.3-java8
-    container_name: resourcemanager
-    restart: always
+    image: bde2020/hadoop-resourcemanager:3.3.3-java8
+    networks:
+      - hadoop
     ports:
      - 18088:8088
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode01:9864 datanode02:9864 datanode03:9864"
+      SERVICE_PRECONDITION: "namenode:9870 historyserver:8188"
     env_file:
       - ./hadoop.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
 
-  nodemanager01:
-    image: m8928/hadoop-nodemanager:3.3.3-java8
-    container_name: nodemanager01
-    restart: always
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode01:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
- 
-  nodemanager02:
-    image: m8928/hadoop-nodemanager:3.3.3-java8
-    container_name: nodemanager02
-    restart: always
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode02:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
-
-  nodemanager03:
-    image: m8928/hadoop-nodemanager:3.3.3-java8
-    container_name: nodemanager03
-    restart: always
-    environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode03:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
- 
   historyserver:
-    image: m8928/hadoop-historyserver:3.3.3-java8
-    container_name: historyserver
-    restart: always
+    image: bde2020/hadoop-historyserver:3.3.3-java8
+    networks:
+      - hadoop
     ports:
       - 18188:8188
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode01:9864 datanode02:9864 datanode03:9864 resourcemanager:8088"
+      SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
     volumes:
-      - /data/docker_container/hadoop_historyserver:/hadoop/yarn/timeline
+      - /data/container_data/historyserver:/hadoop/yarn/timeline
     env_file:
       - ./hadoop.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
 
   metastore:
-    image: mariadb:latest
-    container_name: metastore
-    restart: always
-    ports:
-      - 23306:3306
+    image: postgres:latest
+    networks:
+      - hadoop
+    volumes:
+      - /data/container_data/postgres:/var/lib/postgresql/data/pgdata
     environment:
-      MYSQL_ROOT_PASSWORD: "!gl00sec"
-      MYSQL_DATABASE: "hive"
-      MYSQL_USER: "hive"
-      MYSQL_PASSWORD: "!gl00sec"
+      POSTGRES_PASSWORD: "hive"
+      POSTGRES_USER: "hive"
+      POSTGRES_DB: "hive"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
 
   hiveserver:
-    image: m8928/hadoop-hive:3.1.2-hadoop3.3.3-java8
-    container_name: hiveserver
-    restart: always
+    image: bde2020/hadoop-hiveserver:3.3.3-java8
+    networks:
+      - hadoop
     ports:
       - 20000:10000
       - 20002:10002
     environment:
-      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 metastore:3306"
+      SERVICE_PRECONDITION: "namenode:9870 metastore:5432 resourcemanager:8088 historyserver:8188"
     env_file:
       - ./hadoop.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
+
+networks:
+  hadoop:

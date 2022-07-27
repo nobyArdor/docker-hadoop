@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   namenode:
-    image: 192.168.150.83:15000/m8928/hadoop-namenode:3.3.3-java8
+    image: bde2020/hadoop-namenode:3.3.3-java8
     hostname: "namenode-{{.Node.ID}}"
     networks:
       - hadoop
@@ -26,7 +26,7 @@ services:
         condition: on-failure
 
   datanode:
-    image: 192.168.150.83:15000/m8928/hadoop-datanode:3.3.3-java8
+    image: bde2020/hadoop-datanode:3.3.3-java8
     hostname: "datanode-{{.Node.ID}}"
     networks:
       - hadoop
@@ -52,7 +52,7 @@ services:
         condition: on-failure
 
   nodemanager:
-    image: 192.168.150.83:15000/m8928/hadoop-nodemanager:3.3.3-java8
+    image: bde2020/hadoop-nodemanager:3.3.3-java8
     networks:
       - hadoop
     environment:
@@ -68,7 +68,7 @@ services:
         condition: on-failure
 
   resourcemanager:
-    image: 192.168.150.83:15000/m8928/hadoop-resourcemanager:3.3.3-java8
+    image: bde2020/hadoop-resourcemanager:3.3.3-java8
     networks:
       - hadoop
     ports:
@@ -87,7 +87,7 @@ services:
         condition: on-failure
 
   historyserver:
-    image: 192.168.150.83:15000/m8928/hadoop-historyserver:3.3.3-java8
+    image: bde2020/hadoop-historyserver:3.3.3-java8
     networks:
       - hadoop
     ports:
@@ -128,7 +128,7 @@ services:
         condition: on-failure
 
   hiveserver:
-    image: 192.168.150.83:15000/m8928/hadoop-hiveserver:3.3.3-java8
+    image: bde2020/hadoop-hiveserver:3.3.3-java8
     networks:
       - hadoop
     ports:
