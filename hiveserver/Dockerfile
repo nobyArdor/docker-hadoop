@@ -1,14 +1,15 @@
-FROM 192.168.150.83:15000/m8928/hadoop-base-with-tez:3.2.2-java8
+FROM 192.168.150.83:15000/m8928/hadoop-base-with-tez:3.3.3-java8
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5m CMD curl -f http://localhost:10002/ || exit 1
 
 ENV HIVE_VER=3.1.3
-ENV POSTGRESQL_VER=42.2.19
+ENV POSTGRESQL_VER=42.4.0
 
-COPY apache-hive-$HIVE_VER-bin.tar.gz /apache-hive-$HIVE_VER-bin.tar.gz
+RUN curl -fSL https://dlcdn.apache.org/hive/hive-${HIVE_VER}/apache-hive-${HIVE_VER}-bin.tar.gz  \
+    -o apache-hive-${HIVE_VER}.tar.gz
 
-RUN tar -xvf /apache-hive-$HIVE_VER-bin.tar.gz -C /opt/ && rm /apache-hive-$HIVE_VER-bin.tar.gz
-RUN ln -s /opt/apache-hive-$HIVE_VER-bin /opt/hive
+RUN tar -xvf /apache-hive-$HIVE_VER.tar.gz -C /opt/ && rm /apache-hive-$HIVE_VER.tar.gz
+RUN ln -s /opt/apache-hive-${HIVE_VER}-bin /opt/hive
 RUN rename 's/properties.template/properties/' /opt/hive/conf/*.properties.template
 
 ENV HIVE_HOME=/opt/hive

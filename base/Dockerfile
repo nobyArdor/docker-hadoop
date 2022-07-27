@@ -31,7 +31,7 @@ RUN curl -O https://dist.apache.org/repos/dist/release/hadoop/common/KEYS
 
 RUN gpg --import KEYS
 
-ENV HADOOP_VERSION 3.2.2
+ENV HADOOP_VERSION 3.3.3
 ENV HADOOP_URL https://www.apache.org/dist/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
 
 RUN set -x \
@@ -49,10 +49,11 @@ RUN mkdir /hadoop-data
 
 ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop
-ENV HADOOP_CLASSPATH=/etc/hadoop:/opt/hadoop-3.2.2/share/hadoop/common/lib/*:/opt/hadoop-3.2.2/share/hadoop/common/*:/opt/hadoop-3.2.2/share/hadoop/hdfs:/opt/hadoop-3.2.2/share/hadoop/hdfs/lib/*:/opt/hadoop-3.2.2/share/hadoop/hdfs/*:/opt/hadoop-3.2.2/share/hadoop/mapreduce/lib/*:/opt/hadoop-3.2.2/share/hadoop/mapreduce/*:/opt/hadoop-3.2.2/share/hadoop/yarn:/opt/hadoop-3.2.2/share/hadoop/yarn/lib/*:/opt/hadoop-3.2.2/share/hadoop/yarn/*
+ENV HADOOP_CLASSPATH=/etc/hadoop:/opt/hadoop-3.3.3/share/hadoop/common/lib/*:/opt/hadoop-3.3.3/share/hadoop/common/*:/opt/hadoop-3.3.3/share/hadoop/hdfs:/opt/hadoop-3.3.3/share/hadoop/hdfs/lib/*:/opt/hadoop-3.3.3/share/hadoop/hdfs/*:/opt/hadoop-3.3.3/share/hadoop/mapreduce/lib/*:/opt/hadoop-3.3.3/share/hadoop/mapreduce/*:/opt/hadoop-3.3.3/share/hadoop/yarn:/opt/hadoop-3.3.3/share/hadoop/yarn/lib/*:/opt/hadoop-3.3.3/share/hadoop/yarn/*
 ENV MULTIHOMED_NETWORK=1
 ENV USER=root
 ENV PATH $HADOOP_HOME/bin/:$PATH
+RUN chmod 777 /tmp
 
 ADD entrypoint.sh /entrypoint.sh
 
