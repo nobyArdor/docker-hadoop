@@ -12,9 +12,21 @@ build:
 
 wordcount:
 	docker build -t hadoop-wordcount ./submit
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r -f /output
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r -f /input
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -mkdir -p /input/
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -copyFromLocal -f /opt/hadoop-3.3.3/README.txt /input/
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} hadoop-wordcount
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -cat /output/*
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r /output
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r /input
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r -f /output
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) hdfs dfs -rm -r -f /input
+bash:
+	docker run -it -v /home/noby.ardor/hadoop:/hadoop/user_conf --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base:$(current_branch) bash
+
+wordcountpy:
+	docker build -t hadoop-wordcountpy ./mapper_py
+	docker run -v /home/noby.ardor/hadoop/docker-hadoop/mapper_py:/data --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} hadoop-wordcountpy
+bashpy:
+	docker build -t hadoop-wordcountpy ./mapper_py
+	docker run -it -v /home/noby.ardor/hadoop/docker-hadoop/mapper_py:/data --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} hadoop-wordcountpy bash
+

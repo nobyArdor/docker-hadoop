@@ -44,4 +44,6 @@ ADD entrypoint.sh /entrypoint.sh
 
 RUN chmod a+x /entrypoint.sh
 
+RUN apt-get update && apt-get install -y --no-install-recommends python3
+
 ENTRYPOINT ["/entrypoint.sh"]
