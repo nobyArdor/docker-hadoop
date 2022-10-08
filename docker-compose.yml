@@ -79,7 +79,22 @@ services:
       - "8081:8081"
     environment:
       - "SPARK_MASTER=spark://spark-master:7077"
-      
+  zeppelin:
+    image: bde2020/zeppelin:0.10.1
+    ports:
+      - 8090:8080
+    volumes:
+      - ./../docker-zeppelin/notebook:/opt/zeppelin/notebook
+    environment:
+      SPARK_MASTER: "spark://spark-master:7077"
+      SPARK_HOME: "/spark"
+      ZEPPELIN_ADDR: "0.0.0.0"
+    depends_on:
+      namenode:
+        condition: service_healthy
+    depends_on:
+      - spark-master
+      - spark-worker-1
 
   
 volumes:
