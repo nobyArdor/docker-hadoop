@@ -54,8 +54,45 @@ services:
       - hadoop_historyserver:/hadoop/yarn/timeline
     env_file:
       - ./hadoop.env
+
+  metastore:
+    image: postgres:14.4
+    volumes:
+      - hive_pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_PASSWORD: "hive"
+      POSTGRES_USER: "hive"
+      POSTGRES_DB: "hive"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
+
+  hiveserver:
+    image: bde2020/hive-3.1.3-postgress:3.1.3
+    ports:
+      - 20000:10000
+      - 20002:10002
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 metastore:5432 resourcemanager:8088 historyserver:8188"
+    env_file:
+      - ./hadoop.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.namenode==true
+      restart_policy:
+        condition: on-failure
   
 volumes:
   hadoop_namenode:
   hadoop_datanode:
   hadoop_historyserver:
+  hive_pgdata:

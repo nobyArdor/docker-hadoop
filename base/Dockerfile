@@ -34,14 +34,13 @@ RUN mkdir /opt/hadoop-$HADOOP_VERSION/logs
 
 RUN mkdir /hadoop-data
 
+RUN apt-get update && apt-get install -y --no-install-recommends python3
+
 ENV HADOOP_HOME=/opt/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=/etc/hadoop
 ENV MULTIHOMED_NETWORK=1
 ENV USER=root
 ENV PATH $HADOOP_HOME/bin/:$PATH
-
 ADD entrypoint.sh /entrypoint.sh
-
 RUN chmod a+x /entrypoint.sh
-
 ENTRYPOINT ["/entrypoint.sh"]
