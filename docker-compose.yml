@@ -4,16 +4,14 @@ services:
   namenode:
     image: bde2020/hadoop-namenode:2.0.0-hadoop3.3.3-hive3.1.3-java8
     hostname: "namenode"
-    networks:
-      - hadoop
+    restart: always
     ports:
       - 9870:9870
       - 9000:9000
     volumes:
-      - /data/container_data/namenode:/hadoop/dfs/name
-      - /tmp:/tmp
+      - hadoop_namenode:/hadoop/dfs/name
     environment:
-      - CLUSTER_NAME=HADOOP
+      - CLUSTER_NAME=test
     env_file:
       - ./hadoop.env
     deploy:
@@ -28,10 +26,9 @@ services:
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop3.3.3-hive3.1.3-java8
     hostname: "datanode"
-    networks:
-      - hadoop
+    restart: always
     volumes:
-      - /data/container_data/datanode:/hadoop/dfs/data
+      - hadoop_datanode:/hadoop/dfs/data
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
     env_file:
@@ -51,30 +48,14 @@ services:
       restart_policy:
         condition: on-failure
 
-  nodemanager:
-    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.3.3-hive3.1.3-java8
-    networks:
-      - hadoop
-    environment:
-      SERVICE_PRECONDITION: "namenode:9870 datanode:9864 resourcemanager:8088"
-    env_file:
-      - ./hadoop.env
-    deploy:
-      mode: global
-      placement:
-        constraints:
-          - node.labels.datanode==true
-      restart_policy:
-        condition: on-failure
-
   resourcemanager:
     image: bde2020/hadoop-resourcemanager:2.0.0-hadoop3.3.3-hive3.1.3-java8
-    networks:
-      - hadoop
+    container_name: resourcemanager
+    restart: always
     ports:
-     - 18088:8088
+      - 8088:8088
     environment:
-      SERVICE_PRECONDITION: "namenode:9870 historyserver:8188"
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 historyserver:8188"
     env_file:
       - ./hadoop.env
     deploy:
@@ -86,16 +67,34 @@ services:
       restart_policy:
         condition: on-failure
 
+  nodemanager:
+    image: bde2020/hadoop-nodemanager:2.0.0-hadoop3.3.3-hive3.1.3-java8
+    container_name: nodemanager
+    restart: always
+    ports:
+     - 8042:8042
+    environment:
+      SERVICE_PRECONDITION: "namenode:9000 namenode:9870 datanode:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.labels.datanode==true
+      restart_policy:
+        condition: on-failure
+
   historyserver:
     image: bde2020/hadoop-historyserver:2.0.0-hadoop3.3.3-hive3.1.3-java8
-    networks:
-      - hadoop
+    container_name: historyserver
+    restart: always
     ports:
-      - 18188:8188
+      - 8188:8188
     environment:
       SERVICE_PRECONDITION: "namenode:9870 datanode:9864"
     volumes:
-      - /data/container_data/historyserver:/hadoop/yarn/timeline
+      - hadoop_historyserver:/hadoop/yarn/timeline
     env_file:
       - ./hadoop.env
     deploy:
@@ -109,10 +108,10 @@ services:
 
   metastore:
     image: postgres:14.4
-    networks:
-      - hadoop
     volumes:
-      - /data/container_data/postgres:/var/lib/postgresql/data/pgdata
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: "hive"
       POSTGRES_USER: "hive"
@@ -129,8 +128,6 @@ services:
 
   hiveserver:
     image: bde2020/hadoop-hiveserver:2.0.0-hadoop3.3.3-hive3.1.3-java8
-    networks:
-      - hadoop
     ports:
       - 20000:10000
       - 20002:10002
@@ -147,5 +144,8 @@ services:
       restart_policy:
         condition: on-failure
 
-networks:
-  hadoop:
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  hadoop_historyserver:
+  postgres_data:

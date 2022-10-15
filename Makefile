@@ -1,4 +1,4 @@
-DOCKER_NETWORK = docker-hadoop_hadoop
+DOCKER_NETWORK = docker-hadoop_default
 ENV_FILE = hadoop.env
 current_branch := $(shell git rev-parse --abbrev-ref HEAD)
 build:
@@ -12,6 +12,13 @@ build:
 	docker build -t bde2020/hadoop-submit:$(current_branch) ./submit
 	docker build -t bde2020/hadoop-hiveserver:$(current_branch) ./hiveserver
 
+tez_hdfs:
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -mkdir -p /apps/tez-0.10.1/
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -copyFromLocal -f /opt/tez/share/tez.tar.gz /apps/tez-0.10.1/
+hive_bash:
+	docker run --rm -it --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-hiveserver:$(current_branch) bash
+hive_beeline:
+	docker run --rm -it --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-hiveserver:$(current_branch) bash /opt/hive/bin/beeline -u jdbc:hive2://hiveserver:10000 
 wordcount:
 	docker build -t hadoop-wordcount ./submit
 	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -mkdir -p /input/
