@@ -13,8 +13,8 @@ build:
 	docker build -t bde2020/hadoop-hiveserver:$(current_branch) ./hiveserver
 
 tez_hdfs:
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -mkdir -p /apps/tez-0.10.1/
-	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -copyFromLocal -f /opt/tez/share/tez.tar.gz /apps/tez-0.10.1/
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -mkdir -p /apps/tez-0.10.2/
+	docker run --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-base-with-tez:$(current_branch) hdfs dfs -copyFromLocal -f /opt/tez/share/tez.tar.gz /apps/tez-0.10.2/
 hive_bash:
 	docker run --rm -it --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/hadoop-hiveserver:$(current_branch) bash
 hive_beeline:
