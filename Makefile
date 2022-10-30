@@ -30,3 +30,6 @@ bashpy:
 	docker build -t hadoop-wordcountpy ./mapper_py
 	docker run -it -v /home/noby.ardor/hadoop/docker-hadoop/mapper_py:/data --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} hadoop-wordcountpy bash
 
+bash_zep:
+	docker run --rm -it --network ${DOCKER_NETWORK} --env-file ${ENV_FILE} bde2020/zeppelin:0.10.1 /bin/bash
+
