@@ -3,7 +3,7 @@ FROM bde2020/hadoop-base-with-tez:2.0.0-hadoop3.3.3-hive3.1.3-java8
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5m CMD curl -f http://localhost:10002/ || exit 1
 
 ENV HIVE_VER=3.1.3
-ENV POSTGRESQL_VER=42.4.0
+ENV POSTGRESQL_VER=42.5.0
 
 RUN curl -fSL https://dlcdn.apache.org/hive/hive-${HIVE_VER}/apache-hive-${HIVE_VER}-bin.tar.gz  \
     -o apache-hive-${HIVE_VER}.tar.gz
