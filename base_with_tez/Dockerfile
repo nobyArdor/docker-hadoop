@@ -1,6 +1,6 @@
 FROM bde2020/hadoop-base:2.0.0-hadoop3.3.3-hive3.1.3-java8
 
-ENV TEZ_VERSION 0.10.1
+ENV TEZ_VERSION 0.10.2
 
 RUN curl -fSL https://dlcdn.apache.org/tez/${TEZ_VERSION}/apache-tez-${TEZ_VERSION}-bin.tar.gz  \
     -o ./tez-${TEZ_VERSION}-bin.tar.gz
